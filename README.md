@@ -1,6 +1,6 @@
 ---
-title: ecosync-live
-emoji: ⚡
+title: EcoSync
+emoji: 🌿
 colorFrom: green
 colorTo: blue
 sdk: docker
