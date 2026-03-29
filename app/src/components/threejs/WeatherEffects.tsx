@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -59,7 +59,7 @@ function CloudLayer() {
   const groupRef = useRef<THREE.Group>(null);
 
   const clouds = useMemo(() => {
-    return Array.from({ length: cloudCount }, (_, i) => ({
+    return Array.from({ length: cloudCount }, (_) => ({
       x: (Math.random() - 0.5) * 50,
       y: 10 + Math.random() * 5,
       z: (Math.random() - 0.5) * 50,
@@ -76,7 +76,7 @@ function CloudLayer() {
     }));
   }, []);
 
-  useFrame((_state, delta) => {
+  useFrame((_state) => {
     if (!groupRef.current) return;
     groupRef.current.children.forEach((ch, i) => {
       const cloud = clouds[i];
@@ -197,6 +197,54 @@ function HeatWave() {
   );
 }
 
+// ─── Lightning Bolt ────────────────────────────────────────────────────────
+function Lightning() {
+  const [flash, setFlash] = useState(0);
+  const lastFlash = useRef(0);
+
+  const bolt = useMemo(() => {
+    const points = [];
+    const startX = (Math.random() - 0.5) * 40;
+    const startZ = (Math.random() - 0.5) * 40;
+    let currX = startX;
+    let currY = 20;
+    let currZ = startZ;
+    for (let i = 0; i < 15; i++) {
+      points.push(new THREE.Vector3(currX, currY, currZ));
+      currY -= 2;
+      currX += (Math.random() - 0.5) * 4;
+      currZ += (Math.random() - 0.5) * 4;
+    }
+    return new THREE.BufferGeometry().setFromPoints(points);
+  }, [flash]);
+
+  useFrame((state) => {
+    const time = state.clock.elapsedTime;
+    if (time - lastFlash.current > 4 + Math.random() * 6) {
+      setFlash((f: number) => f + 1);
+      lastFlash.current = time;
+    }
+  });
+
+  const isFlashing = (Date.now() / 1000 - lastFlash.current) < 0.15;
+
+  return (
+    <group>
+      {isFlashing && (
+        <>
+          <pointLight position={[0, 15, 0]} intensity={15} color="#cbd5e1" distance={100} />
+          <primitive object={new THREE.Line(bolt, new THREE.LineBasicMaterial({
+            color: '#ffffff',
+            linewidth: 3,
+            transparent: true,
+            opacity: 0.9
+          }))} />
+        </>
+      )}
+    </group>
+  );
+}
+
 // ─── Main WeatherEffects Component ──────────────────────────────────────────
 export function WeatherEffects({ weather }: { weather: string }) {
   const isClear = !weather || weather === 'CLEAR';
@@ -206,19 +254,20 @@ export function WeatherEffects({ weather }: { weather: string }) {
       {/* OVERCAST — fog + floating cloud layer */}
       {weather === 'OVERCAST' && (
         <>
-          <fog attach="fog" args={['#475569', 8, 35]} />
-          <ambientLight intensity={0.15} />
+          <fog attach="fog" args={['#334155', 5, 30]} />
+          <ambientLight intensity={0.12} />
           <CloudLayer />
         </>
       )}
 
-      {/* STORM — dark fog + heavy rain */}
+      {/* STORM — dark fog + heavy rain + lightning */}
       {weather === 'STORM' && (
         <>
-          <fog attach="fog" args={['#1e1b4b', 3, 20]} />
+          <fog attach="fog" args={['#1e1b4b', 2, 18]} />
           <ambientLight intensity={0.05} />
           <Precipitation type="rain" />
           <CloudLayer />
+          <Lightning />
         </>
       )}
 
@@ -235,9 +284,9 @@ export function WeatherEffects({ weather }: { weather: string }) {
       {/* HEAT_WAVE — orange fog + shimmer + intense light */}
       {weather === 'HEAT_WAVE' && (
         <>
-          <fog attach="fog" args={['#9a3412', 10, 40]} />
-          <ambientLight intensity={0.5} />
-          <pointLight position={[0, 10, 0]} color="#ea580c" intensity={2} />
+          <fog attach="fog" args={['#7c2d12', 8, 35]} />
+          <ambientLight intensity={0.6} />
+          <pointLight position={[0, 15, 0]} color="#f97316" intensity={3} distance={50} />
           <HeatWave />
         </>
       )}
