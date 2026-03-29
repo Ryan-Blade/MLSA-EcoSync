@@ -1,0 +1,25 @@
+﻿d35edaf fix(UI): restore routing import for OSM models and fix conflicts
+1523b61 Deploy: Fresh Hugging Face Backend
+d610903 feat: complete production simulation, OSM extraction, and thermal fallback
+7c20e04 fix(api): Add root endpoint for HF Health Probes
+9f1cb08 fix(UI): Resolve CesiumGrid import mapping to CityGrid module
+7c9a835 Fix HF deploy: Remove large binary files and logs from track
+b5a85e7 Hotfix: Fix MQTT Client ID Collisions
+0f6fb44 Deploy: API HF Root Probe
+42bae53 Deploy: App Fix
+e9935df Deploy: Fresh branch without binaries
+56e5132 HF Deploy: UUID Patches
+988eccc Final Clean HF Backend Sync
+83a480a HF Sync: Restore Backend components
+a9390b2 Merge branch 'Prithanjan' into main: Integrate frontend modernization while retaining remote backend
+1dda766 HF Deploy Phase 5
+703d361 chore: Final optimizations and Vercel/HF Production deployment configurations
+bd40449 Deployment to HF Space
+0f0e291 Deployment to HF Space
+94d8b68 HF Sync
+30a7dcc HF Sync
+06c9af8 HF Sync
+6dbbbc3 WIP on main: 2a32e80 feat: Replace map engine with Cesium portal UI
+5129847 index on main: 2a32e80 feat: Replace map engine with Cesium portal UI
+2a32e80 feat: Replace map engine with Cesium portal UI
+05e2da7 feat(ui): modernize landing page with high-performance animations, matte black theme, and new components

@@ -393,6 +393,48 @@ async def get_trades(limit: int = 20):
     return t[-limit:]
 
 
+@app.post("/api/building/{building_id}/destroy")
+async def destroy_building(building_id: int):
+    """
+    Mark a building as destroyed:
+    - Remove it from live telemetry data
+    - Broadcast building_destroyed event to all WebSocket clients
+    - Trigger a grid rebalancing event
+    """
+    existed = building_id in building_data
+    if existed:
+        del building_data[building_id]
+        # Invalidate analytics cache
+        global _analytics_cache_ts
+        _analytics_cache_ts = 0.0
+
+    destroy_msg = {
+        "type": "building_destroyed",
+        "building_id": building_id,
+        "timestamp": datetime.now().isoformat(),
+    }
+
+    # Broadcast destruction to all connected WebSocket clients
+    await manager.broadcast(destroy_msg)
+
+    # Trigger a grid rebalance event
+    grid_event = {
+        "type": "grid_rebalance",
+        "active": True,
+        "reason": f"Building {building_id} offline",
+        "timestamp": datetime.now().isoformat(),
+    }
+    mqtt_client.publish("ecosync/grid/events", json.dumps(grid_event))
+    await manager.broadcast({"type": "grid_event", "data": grid_event})
+
+    return {
+        "status": "success",
+        "building_id": building_id,
+        "existed": existed,
+        "message": f"Building {building_id} destroyed. Grid rebalancing initiated.",
+    }
+
+
 # ── WebSocket endpoint ────────────────────────────────────────────────────────
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):

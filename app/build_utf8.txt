@@ -1,0 +1,40 @@
+
+> my-app@0.0.0 build
+> vite build
+
+[36mvite v7.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m✓[39m 5 modules transformed.
+[31m✗[39m Build failed in 717ms
+[31merror during build:
+[31m[vite:esbuild] Transform failed with 2 errors:
+C:/Users/sulph/OneDrive/Desktop/Kimi_Agent_EcoSync Full Stack Build/app/src/pages/LandingPage.tsx:546:12: ERROR: Unexpected closing "div" tag does not match opening "section" tag
+C:/Users/sulph/OneDrive/Desktop/Kimi_Agent_EcoSync Full Stack Build/app/src/pages/LandingPage.tsx:548:16: ERROR: Unterminated regular expression[31m
+file: [36mC:/Users/sulph/OneDrive/Desktop/Kimi_Agent_EcoSync Full Stack Build/app/src/pages/LandingPage.tsx:546:12[31m
+[33m
+[33mUnexpected closing "div" tag does not match opening "section" tag[33m
+544 |                </div>
+545 |              </div>
+546 |            </div>
+    |              ^
+547 |          </div>
+548 |        </section>
+
+[33mUnterminated regular expression[33m
+546 |            </div>
+547 |          </div>
+548 |        </section>
+    |                  ^
+549 |  
+550 |        {/* ── FOOTER ── */}
+[31m
+    at failureErrorWithLog (C:\Users\sulph\OneDrive\Desktop\Kimi_Agent_EcoSync Full Stack Build\app\node_modules\esbuild\lib\main.js:1467:15)
+    at C:\Users\sulph\OneDrive\Desktop\Kimi_Agent_EcoSync Full Stack Build\app\node_modules\esbuild\lib\main.js:736:50
+    at responseCallbacks.<computed> (C:\Users\sulph\OneDrive\Desktop\Kimi_Agent_EcoSync Full Stack Build\app\node_modules\esbuild\lib\main.js:603:9)
+    at handleIncomingPacket (C:\Users\sulph\OneDrive\Desktop\Kimi_Agent_EcoSync Full Stack Build\app\node_modules\esbuild\lib\main.js:658:12)
+    at Socket.readFromStdout (C:\Users\sulph\OneDrive\Desktop\Kimi_Agent_EcoSync Full Stack Build\app\node_modules\esbuild\lib\main.js:581:7)
+    at Socket.emit (node:events:508:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)[39m

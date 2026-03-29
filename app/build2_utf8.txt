@@ -1,0 +1,104 @@
+﻿
+> my-app@0.0.0 build
+> vite build
+
+[36mvite v7.3.0 [32mbuilding client environment for production...[36m[39m
+node.exe : 
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (:  
+  String) [], RemoteExc   
+ eption
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+/cesium/Widgets/widgets.cs
+s doesn't exist at build 
+time, it will remain 
+unchanged to be resolved 
+at runtime
+transforming...
+[32mÔ£ô[39m 8 modules transformed.
+[31mÔ£ù[39m Build 
+failed in 11.59s
+[31merror during build:
+[31m[vite:esbuild] 
+Transform failed with 1 
+error:
+C:/Users/sulph/OneDrive/De
+sktop/Kimi_Agent_EcoSync 
+Full Stack Build/app/src/p
+ages/StartScreen.tsx:248:0
+: ERROR: Unexpected 
+"<<"[31m
+file: [36mC:/Users/sulph/
+OneDrive/Desktop/Kimi_Agen
+t_EcoSync Full Stack Build
+/app/src/pages/StartScreen
+.tsx:248:0[31m
+[33m
+[33mUnexpected "<<"[33m
+246 |    }, [navigate]);
+247 |  
+248 |  <<<<<<< Updated 
+upstream
+    |  ^
+249 |      // If not in 
+local lookup, try 
+Geoapify geocoding
+250 |      if (!coords) {
+[31m
+    at 
+failureErrorWithLog (C:\Us
+ers\sulph\OneDrive\Desktop
+\Kimi_Agent_EcoSync Full 
+Stack Build\app\node_modul
+es\esbuild\lib\main.js:146
+7:15)
+    at C:\Users\sulph\OneD
+rive\Desktop\Kimi_Agent_Ec
+oSync Full Stack Build\app
+\node_modules\esbuild\lib\
+main.js:736:50
+    at responseCallbacks.<
+computed> (C:\Users\sulph\
+OneDrive\Desktop\Kimi_Agen
+t_EcoSync Full Stack Build
+\app\node_modules\esbuild\
+lib\main.js:603:9)
+    at 
+handleIncomingPacket (C:\U
+sers\sulph\OneDrive\Deskto
+p\Kimi_Agent_EcoSync Full 
+Stack Build\app\node_modul
+es\esbuild\lib\main.js:658
+:12)
+    at 
+Socket.readFromStdout (C:\
+Users\sulph\OneDrive\Deskt
+op\Kimi_Agent_EcoSync 
+Full Stack Build\app\node_
+modules\esbuild\lib\main.j
+s:581:7)
+    at Socket.emit 
+(node:events:508:28)
+    at addChunk (node:inte
+rnal/streams/readable:559:
+12)
+    at readableAddChunkPus
+hByteMode (node:internal/s
+treams/readable:510:3)
+    at Readable.push (node
+:internal/streams/readable
+:390:5)
+    at Pipe.onStreamRead (
+node:internal/stream_base_
+commons:189:23)[39m

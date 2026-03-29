@@ -33,6 +33,9 @@ interface AnalyticsDashboardProps {
   activePowerSources?: Record<string, boolean>;
   onTogglePowerSource?: (source: string) => void;
   weatherData?: WeatherData | null;
+  destroyMode?: boolean;
+  onToggleDestroyMode?: () => void;
+  destroyedCount?: number;
 }
 
 const COLORS = {
@@ -195,6 +198,9 @@ export function AnalyticsDashboard({
   activePowerSources = {},
   onTogglePowerSource,
   weatherData,
+  destroyMode = false,
+  onToggleDestroyMode,
+  destroyedCount = 0,
 }: AnalyticsDashboardProps) {
 
   const statusDistribution = useMemo(() => [
@@ -297,11 +303,14 @@ export function AnalyticsDashboard({
             className="rounded-xl p-4"
             style={{ background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(16,185,129,0.3)' }}
           >
-            <GodModePanel 
-              onTriggerEvent={onTriggerEvent} 
+            <GodModePanel
+              onTriggerEvent={onTriggerEvent}
               activeWeather={activeWeather}
               activePowerSources={activePowerSources}
               onTogglePowerSource={onTogglePowerSource || (() => {})}
+              destroyMode={destroyMode}
+              onToggleDestroyMode={onToggleDestroyMode}
+              destroyedCount={destroyedCount}
             />
           </div>
         </div>

@@ -1,0 +1,48 @@
+{
+  "name": "EcoSync — Smart Energy Grid",
+  "short_name": "EcoSync",
+  "description": "AI-powered smart energy microgrid simulation with 50 buildings and real-time P2P energy trading",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#040914",
+  "theme_color": "#10b981",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "EcoSync Dashboard"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "EcoSync Mobile"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Launch Dashboard",
+      "url": "/dashboard",
+      "description": "Open EcoSync energy simulation"
+    }
+  ]
+}

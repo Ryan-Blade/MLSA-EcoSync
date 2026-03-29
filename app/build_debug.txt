@@ -1,0 +1,107 @@
+﻿
+> my-app@0.0.0 build
+> vite build
+
+[36mvite v7.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 13 modules transformed.
+node.exe : [31mÔ£ù[39m 
+Build failed in 1.66s
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (  
+  [31mÔ£ù[39m Build fa   
+ iled in 1.66s:String)    
+ [], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+[31merror during build:
+[31m[vite]: Rollup 
+failed to resolve import 
+"framer-motion" from "C:/U
+sers/sulph/OneDrive/Deskto
+p/Kimi_Agent_EcoSync Full 
+Stack Build/app/src/pages/
+LandingPage.tsx".
+This is most likely 
+unintended because it can 
+break your application at 
+runtime.
+If you do want to 
+externalize this module 
+explicitly add it to
+`build.rollupOptions.exter
+nal`[31m
+    at viteLog (file:///C:
+/Users/sulph/OneDrive/Desk
+top/Kimi_Agent_EcoSync%20F
+ull%20Stack%20Build/app/no
+de_modules/vite/dist/node/
+chunks/config.js:33634:57)
+    at file:///C:/Users/su
+lph/OneDrive/Desktop/Kimi_
+Agent_EcoSync%20Full%20Sta
+ck%20Build/app/node_module
+s/vite/dist/node/chunks/co
+nfig.js:33668:73
+    at onwarn (file:///C:/
+Users/sulph/OneDrive/Deskt
+op/Kimi_Agent_EcoSync%20Fu
+ll%20Stack%20Build/app/nod
+e_modules/@vitejs/plugin-r
+eact/dist/index.js:76:7)
+    at file:///C:/Users/su
+lph/OneDrive/Desktop/Kimi_
+Agent_EcoSync%20Full%20Sta
+ck%20Build/app/node_module
+s/vite/dist/node/chunks/co
+nfig.js:33668:28
+    at onRollupLog (file:/
+//C:/Users/sulph/OneDrive/
+Desktop/Kimi_Agent_EcoSync
+%20Full%20Stack%20Build/ap
+p/node_modules/vite/dist/n
+ode/chunks/config.js:33663
+:63)
+    at onLog (file:///C:/U
+sers/sulph/OneDrive/Deskto
+p/Kimi_Agent_EcoSync%20Ful
+l%20Stack%20Build/app/node
+_modules/vite/dist/node/ch
+unks/config.js:33466:4)
+    at file:///C:/Users/su
+lph/OneDrive/Desktop/Kimi_
+Agent_EcoSync%20Full%20Sta
+ck%20Build/app/node_module
+s/rollup/dist/es/shared/no
+de-entry.js:21081:32
+    at Object.logger [as 
+onLog] (file:///C:/Users/s
+ulph/OneDrive/Desktop/Kimi
+_Agent_EcoSync%20Full%20St
+ack%20Build/app/node_modul
+es/rollup/dist/es/shared/n
+ode-entry.js:22968:9)
+    at ModuleLoader.handle
+InvalidResolvedId (file://
+/C:/Users/sulph/OneDrive/D
+esktop/Kimi_Agent_EcoSync%
+20Full%20Stack%20Build/app
+/node_modules/rollup/dist/
+es/shared/node-entry.js:21
+712:26)
+    at file:///C:/Users/su
+lph/OneDrive/Desktop/Kimi_
+Agent_EcoSync%20Full%20Sta
+ck%20Build/app/node_module
+s/rollup/dist/es/shared/no
+de-entry.js:21670:26[39m
