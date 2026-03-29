@@ -1,14 +1,13 @@
 ---
 title: EcoSync
-emoji: ðŸŒ¿
+emoji: ⚡
 colorFrom: green
 colorTo: blue
 sdk: docker
 app_port: 8000
-pinned: false
 ---
 
-# ðŸŒ¿ EcoSync â€” Smart City Energy Microgrid
+# 🌿 EcoSync — Smart City Energy Microgrid
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com)
