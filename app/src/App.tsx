@@ -12,17 +12,14 @@ import {
   Menu,
   X,
   Maximize2,
-  Minimize2,
-  CloudRain,
-  ShieldAlert,
-  DollarSign
+  Minimize2
 } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
 import { CityGrid } from '@/components/threejs/CityGrid';
 import { AnalyticsDashboard } from '@/components/dashboard/AnalyticsDashboard';
 import { LogTerminal } from '@/components/terminal/LogTerminal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useWeather } from '@/hooks/useWeather';
 import { 
   Sheet,
   SheetContent,
@@ -30,6 +27,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useLocation } from 'react-router-dom';
 import type { 
   BuildingTelemetry, 
   AgentLog, 
@@ -38,8 +36,6 @@ import type {
   GridEvent 
 } from '@/types';
 import './App.css';
-// @ts-expect-error - JSX module without type declarations
-import Particles from '@/components/Particles';
 
 // WebSocket connection hook
 function useWebSocket(url: string) {
@@ -154,6 +150,9 @@ function useWebSocket(url: string) {
   return { connected, buildings, logs, gridEvents, sendMessage };
 }
 
+// Global Fallback URLs
+const API_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname.includes('vercel') ? 'https://ryanblad3-ecosync-live.hf.space' : '');
+
 // API polling hook for analytics
 function useAnalyticsPolling(interval: number = 5000) {
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
@@ -165,7 +164,7 @@ function useAnalyticsPolling(interval: number = 5000) {
       try {
         // Fetch market status FIRST to include in history
         let currentMarketPrice = 0.15;
-        const marketRes = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/market/status`);
+        const marketRes = await fetch(`${API_URL}/api/market/status`);
         if (marketRes.ok) {
           const marketData = await marketRes.json();
           setMarketStatus(marketData);
@@ -173,7 +172,7 @@ function useAnalyticsPolling(interval: number = 5000) {
         }
 
         // Fetch analytics
-        const analyticsRes = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/analytics/summary`);
+        const analyticsRes = await fetch(`${API_URL}/api/analytics/summary`);
         if (analyticsRes.ok) {
           const analyticsData = await analyticsRes.json();
           setAnalytics(analyticsData);
@@ -209,24 +208,40 @@ function useAnalyticsPolling(interval: number = 5000) {
 function App() {
   const location = useLocation();
   const geoBuildings = location.state?.buildings || [];
-  
-  const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const defaultWsUrl = typeof window !== 'undefined' ? `${wsProtocol}//${window.location.host}/ws` : 'ws://localhost:8000/ws';
+  const searchLocation = location.state?.pincode || location.state?.regionName || 'New York';
+  const defaultWsUrl = typeof window !== 'undefined' && window.location.hostname.includes('vercel') 
+    ? 'wss://ryanblad3-ecosync-live.hf.space/ws' 
+    : 'ws://localhost:8000/ws';
   const wsUrl = import.meta.env.VITE_WS_URL || defaultWsUrl;
   const { connected, buildings, logs, gridEvents } = useWebSocket(wsUrl);
   const { analytics, marketStatus, history } = useAnalyticsPolling(5000);
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingTelemetry | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [terminalExpanded, setTerminalExpanded] = useState(false);
+  const [activePowerSources, setActivePowerSources] = useState<Record<string, boolean>>({
+    solar: true,
+    wind: false,
+    hydro: false,
+    gas: false,
+  });
+
+  const { weatherData } = useWeather(searchLocation);
+
+  const togglePowerSource = useCallback((source: string) => {
+    setActivePowerSources(prev => ({ ...prev, [source]: !prev[source] }));
+  }, []);
 
   // Get active grid events (memoized — only recomputes when gridEvents changes)
   const activeEvents    = useMemo(() => gridEvents.filter(e => e.active), [gridEvents]);
   const hasCloudCover   = useMemo(() => activeEvents.some(e => e.type === 'cloud_cover'),  [activeEvents]);
   const hasGridFailure  = useMemo(() => activeEvents.some(e => e.type === 'grid_failure'), [activeEvents]);
+  
+  const activeWeatherEvent = useMemo(() => activeEvents.find(e => e.type === 'weather_change' && e.weather), [activeEvents]);
+  const activeWeather = activeWeatherEvent ? activeWeatherEvent.weather : 'CLEAR';
 
   const triggerEvent = async (type: string, payload: any = {}) => {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || ''}/api/grid/event`, {
+      await fetch(`${API_URL}/api/grid/event`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event_type: type, ...payload })
@@ -236,23 +251,20 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    if (weatherData && weatherData.gridCondition && activeWeather !== weatherData.gridCondition) {
+      // Small timeout to prevent immediate spam on mount
+      const t = setTimeout(() => {
+        triggerEvent('weather_change', { weather: weatherData.gridCondition });
+      }, 2000);
+      return () => clearTimeout(t);
+    }
+  }, [weatherData?.gridCondition, activeWeather]);
+
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans">
-      {/* Subtle particles background */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <Particles
-          particleColors={["#10b981", "#ffffff"]}
-          particleCount={50}
-          particleSpread={12}
-          speed={0.05}
-          particleBaseSize={80}
-          moveParticlesOnHover={false}
-          alphaParticles={true}
-          disableRotation={false}
-        />
-      </div>
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border shadow-sm">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900/40 backdrop-blur-xl border-b border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
         <div className="flex items-center justify-between px-4 py-3">
           {/* Logo */}
           <div className="flex items-center gap-3">
@@ -297,18 +309,7 @@ function App() {
               activeColor="text-green-400"
             />
             
-            {/* Control Panel Buttons */}
-            <div className="hidden xl:flex items-center gap-2 ml-6 pl-6 border-l border-slate-700/50">
-              <Button size="sm" variant="outline" className="h-8 text-xs font-bold border-blue-500/50 bg-blue-500/5 hover:bg-blue-500/20 text-blue-300" onClick={() => triggerEvent('cloud_cover', { intensity: 0.8, duration: 30 })}>
-                <CloudRain className="w-3 h-3 mr-1.5" /> Cloud Cover
-              </Button>
-              <Button size="sm" variant="outline" className="h-8 text-xs font-bold border-red-500/50 bg-red-500/5 hover:bg-red-500/20 text-red-300" onClick={() => triggerEvent('grid_failure', { duration: 60 })}>
-                <ShieldAlert className="w-3 h-3 mr-1.5" /> Grid Failure
-              </Button>
-              <Button size="sm" variant="outline" className="h-8 text-xs font-bold border-amber-500/50 bg-amber-500/5 hover:bg-amber-500/20 text-amber-300" onClick={() => triggerEvent('price_update', { price: 0.50 })}>
-                <DollarSign className="w-3 h-3 mr-1.5" /> Price Surge
-              </Button>
-            </div>
+            {/* Market Control (Legacy buttons removed in favor of GodModePanel) */}
           </div>
 
           {/* Mobile Menu */}
@@ -318,7 +319,7 @@ function App() {
                 <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-80 bg-background border-border">
+            <SheetContent side="right" className="w-80 bg-slate-900 border-emerald-500/30">
               <SheetHeader>
                 <SheetTitle className="text-emerald-400">System Status</SheetTitle>
               </SheetHeader>
@@ -375,12 +376,16 @@ function App() {
           <div className="flex-1 relative">
             <CityGrid 
               buildings={buildings}
+              geoBuildings={geoBuildings}
               onBuildingClick={setSelectedBuilding}
+              activeWeather={activeWeather}
+              activeEvents={activeEvents}
+              activePowerSources={activePowerSources}
             />
             
             {/* Building Info Overlay */}
             {selectedBuilding && (
-              <div className="absolute top-4 left-4 glass rounded-lg p-4 max-w-xs">
+              <div className="absolute top-4 left-4 bg-slate-900/90 backdrop-blur-md border border-emerald-500/30 rounded-lg p-4 max-w-xs">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-bold text-emerald-400">
                     Building #{selectedBuilding.building_id}
@@ -435,7 +440,7 @@ function App() {
             )}
 
             {/* Legend */}
-            <div className="absolute bottom-4 left-4 glass rounded-lg p-3">
+            <div className="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur-md border border-emerald-500/30 rounded-lg p-3">
               <h4 className="text-xs font-bold text-slate-400 mb-2">Legend</h4>
               <div className="space-y-1 text-xs">
                 <div className="flex items-center gap-2">
@@ -463,7 +468,7 @@ function App() {
           </div>
 
           {/* Sidebar - Analytics */}
-          <div className="hidden lg:flex lg:flex-col w-golden-min bg-background/50 border-l border-border overflow-y-auto overflow-x-hidden">
+          <div className="hidden lg:flex lg:flex-col w-96 bg-slate-900/50 border-l border-emerald-500/30 overflow-y-auto overflow-x-hidden">
             <div className="p-4 min-w-0">
               <div className="flex items-center gap-2 mb-5 pb-3 border-b border-emerald-500/20">
                 <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
@@ -480,6 +485,11 @@ function App() {
                 marketStatus={marketStatus}
                 history={history}
                 onBuildingSelect={setSelectedBuilding}
+                onTriggerEvent={triggerEvent}
+                activeWeather={activeWeather}
+                activePowerSources={activePowerSources}
+                onTogglePowerSource={togglePowerSource}
+                weatherData={weatherData}
               />
             </div>
           </div>
@@ -487,11 +497,11 @@ function App() {
 
         {/* Terminal Section */}
         <div 
-          className={`border-t border-border bg-background transition-all duration-300 ${
+          className={`border-t border-emerald-500/30 bg-slate-950 transition-all duration-300 ${
             terminalExpanded ? 'h-96' : 'h-48'
           }`}
         >
-          <div className="flex items-center justify-between px-4 py-2 bg-background/80 border-b border-border">
+          <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-emerald-500/30">
             <div className="flex items-center gap-2">
               <Cloud className="w-4 h-4 text-emerald-400" />
               <span className="text-sm font-medium text-emerald-400">AI Agent Logs</span>
