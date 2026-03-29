@@ -184,34 +184,46 @@ export const GodModePanel = memo(function GodModePanel({
       {/* ── Building Destruction Mode ─────────────────────────── */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Bomb className="w-3.5 h-3.5 text-red-400" />
-          <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Destruction</h3>
+          <Bomb className="w-3.5 h-3.5 text-red-500" />
+          <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Tactical Decommissioning</h3>
         </div>
         <button
           id="btn-destroy-mode"
           onClick={onToggleDestroyMode}
-          style={destroyMode ? { boxShadow: '0 0 16px rgba(239,68,68,0.5), inset 0 0 10px rgba(239,68,68,0.1)' } : {}}
+          style={destroyMode ? { boxShadow: '0 0 20px rgba(239,68,68,0.6), inset 0 0 10px rgba(239,68,68,0.2)' } : {}}
           className={`
-            w-full h-10 flex items-center justify-center gap-2 px-3 rounded-lg text-xs font-bold tracking-wider
+            w-full h-11 flex items-center justify-center gap-2 px-3 rounded-lg text-xs font-black tracking-widest uppercase
             transition-all duration-300 border
             ${destroyMode
-              ? 'border-red-500/70 bg-red-500/15 text-red-300 animate-pulse ring-1 ring-red-500/40'
-              : 'border-red-500/30 bg-red-500/5 text-red-500/70 hover:border-red-500/60 hover:bg-red-500/10 hover:text-red-400'
+              ? 'border-red-500 bg-red-500/20 text-red-400 animate-pulse ring-2 ring-red-500/50'
+              : 'border-red-500/20 bg-red-500/5 text-red-500/60 hover:border-red-500/60 hover:bg-red-500/15 hover:text-red-400'
             }
             hover:scale-[1.01] active:scale-98
           `}
         >
           <Bomb className={`w-4 h-4 ${destroyMode ? 'animate-bounce' : ''}`} />
-          {destroyMode ? '⚡ DESTROY MODE — Click a building' : '💥 Enable Destroy Mode'}
+          {destroyMode ? '⚡ SELECT TARGET BUILDING' : '🎯 TARGET & DESTROY'}
           {destroyedCount > 0 && (
             <span className="ml-auto text-[9px] bg-red-500/30 text-red-300 px-1.5 py-0.5 rounded font-mono">
-              {destroyedCount} destroyed
+              {destroyedCount}
             </span>
           )}
         </button>
-        {destroyMode && (
-          <p className="mt-1.5 text-[9px] text-red-400/60 text-center animate-pulse">
-            Energy wires will reroute in real-time
+        {destroyMode ? (
+          <div className="mt-2.5 p-2 rounded bg-red-950/20 border border-red-900/40 text-center">
+            <p className="text-[9px] text-red-400 font-bold animate-pulse uppercase tracking-tighter">
+              Awaiting Target Selection...
+            </p>
+            <button 
+              onClick={onToggleDestroyMode} 
+              className="mt-1 text-[8px] text-slate-500 hover:text-red-400 underline uppercase tracking-widest"
+            >
+              Cancel Mission
+            </button>
+          </div>
+        ) : (
+          <p className="mt-1.5 text-[9px] text-slate-500 text-center italic">
+            Select a building on the map to decommission it permanently.
           </p>
         )}
       </div>

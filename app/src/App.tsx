@@ -354,9 +354,20 @@ function App() {
       </header>
 
       {/* ── Main Content ── */}
-      <main className="pt-16 h-screen flex flex-col">
-        <div className="flex-1 flex overflow-hidden">
+      <main className={`pt-16 h-screen flex flex-col ${destroyMode ? 'cursor-crosshair' : ''}`}>
+        <div className="flex-1 flex overflow-hidden relative">
 
+          {/* Targeting Overlay (Vignette) */}
+          {destroyMode && (
+            <div className="absolute inset-0 z-40 pointer-events-none border-[12px] border-red-500/20 shadow-[inset_0_0_100px_rgba(239,68,68,0.2)] animate-pulse">
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 px-6 py-2 bg-red-600/90 text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-full shadow-2xl">
+                Targeting System Active
+              </div>
+              {/* Scanning lines */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%] pointer-events-none opacity-20" />
+            </div>
+          )}
+ 
           {/* 3D City View */}
           <div className="flex-1 relative">
             <CityGrid

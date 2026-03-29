@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Edges } from '@react-three/drei';
 import * as THREE from 'three';
@@ -14,36 +14,71 @@ interface BuildingProps {
   destroyMode?: boolean;
 }
 
-// Rubble mesh shown when a building is destroyed
+// ─── Explosion Effect (Brief) ────────────────────────────────────────────────
+function Explosion({ position }: { position: [number, number, number] }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  useFrame((state) => {
+    if (meshRef.current) {
+      const scale = 1 + (state.clock.elapsedTime % 0.5) * 10;
+      meshRef.current.scale.setScalar(scale);
+      (meshRef.current.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 1 - (state.clock.elapsedTime % 0.5) * 2);
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={position}>
+      <sphereGeometry args={[1, 16, 16]} />
+      <meshBasicMaterial color="#f97316" transparent opacity={0.8} />
+    </mesh>
+  );
+}
+
+// ─── Rubble mesh shown when a building is destroyed ───────────────────────
 function RubbleMesh({ color }: { color: string }) {
-  const pieces = useMemo(() => Array.from({ length: 6 }, (_, i) => ({
-    x: (Math.random() - 0.5) * 0.6,
-    z: (Math.random() - 0.5) * 0.6,
+  const pieces = useMemo(() => Array.from({ length: 12 }, (_) => ({
+    x: (Math.random() - 0.5) * 0.8,
+    z: (Math.random() - 0.5) * 0.8,
     ry: Math.random() * Math.PI,
-    w: 0.15 + Math.random() * 0.25,
-    d: 0.15 + Math.random() * 0.25,
-    h: 0.05 + Math.random() * 0.12,
+    rz: Math.random() * Math.PI,
+    w: 0.1 + Math.random() * 0.3,
+    d: 0.1 + Math.random() * 0.3,
+    h: 0.05 + Math.random() * 0.15,
   })), []);
+
+  const smokeRef = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (smokeRef.current) {
+      smokeRef.current.children.forEach((s, i) => {
+        s.position.y += 0.01 + Math.sin(state.clock.elapsedTime + i) * 0.005;
+        if (s.position.y > 2) s.position.y = 0.4;
+        s.scale.setScalar(1 + Math.sin(state.clock.elapsedTime * 2 + i) * 0.2);
+      });
+    }
+  });
 
   return (
     <group>
       {/* Scorch mark on ground */}
       <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[0.7, 16]} />
-        <meshBasicMaterial color="#1a0a0a" transparent opacity={0.85} />
+        <circleGeometry args={[0.9, 16]} />
+        <meshBasicMaterial color="#1a0a0a" transparent opacity={0.9} />
       </mesh>
       {/* Rubble chunks */}
       {pieces.map((p, i) => (
-        <mesh key={i} position={[p.x, p.h / 2, p.z]} rotation={[0, p.ry, 0]}>
+        <mesh key={i} position={[p.x, p.h / 2, p.z]} rotation={[0, p.ry, p.rz]}>
           <boxGeometry args={[p.w, p.h, p.d]} />
-          <meshStandardMaterial color={color} roughness={0.9} metalness={0.1} />
+          <meshStandardMaterial color={i % 3 === 0 ? "#475569" : color} roughness={0.9} metalness={0.1} />
         </mesh>
       ))}
-      {/* Smoke wisps */}
-      <mesh position={[0, 0.5, 0]}>
-        <sphereGeometry args={[0.3, 8, 8]} />
-        <meshBasicMaterial color="#4a4a4a" transparent opacity={0.25} depthWrite={false} />
-      </mesh>
+      {/* Persistent Smoke wisps */}
+      <group ref={smokeRef}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <mesh key={i} position={[(Math.random() - 0.5) * 0.4, 0.5 + i * 0.3, (Math.random() - 0.5) * 0.4]}>
+            <sphereGeometry args={[0.25, 8, 8]} />
+            <meshBasicMaterial color="#4a4a4a" transparent opacity={0.15} depthWrite={false} />
+          </mesh>
+        ))}
+      </group>
     </group>
   );
 }
@@ -54,6 +89,17 @@ export function Building({ data, position, geoScaleY = 1, geoShape, onClick, isD
   const topRef = useRef<THREE.Mesh>(null);
   const reticleRef = useRef<THREE.Mesh>(null);
   const isHovered = useRef(false);
+  const [showExplosion, setShowExplosion] = useState(false);
+  const explodedRef = useRef(false);
+
+  useEffect(() => {
+    if (isDestroyed && !explodedRef.current) {
+      setShowExplosion(true);
+      explodedRef.current = true;
+      const t = setTimeout(() => setShowExplosion(false), 800);
+      return () => clearTimeout(t);
+    }
+  }, [isDestroyed]);
 
   const { color, emissive, height, scaleY } = useMemo(() => {
     let color = '#3b82f6';
@@ -145,7 +191,8 @@ export function Building({ data, position, geoScaleY = 1, geoShape, onClick, isD
     // Reticle pulses in destroy mode
     if (reticleRef.current && destroyMode) {
       const pulse = 0.6 + Math.sin(state.clock.elapsedTime * 4) * 0.4;
-      reticleRef.current.material.opacity = pulse * (isHovered.current ? 1 : 0.5);
+      const mat = reticleRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = pulse * (isHovered.current ? 1 : 0.5);
     }
   });
 
@@ -153,6 +200,7 @@ export function Building({ data, position, geoScaleY = 1, geoShape, onClick, isD
     return (
       <group position={position}>
         <RubbleMesh color={emissive} />
+        {showExplosion && <Explosion position={[0, 1, 0]} />}
       </group>
     );
   }
